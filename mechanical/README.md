@@ -10,7 +10,7 @@ File `hand_prototype.scad` adalah **sumber CAD OpenSCAD yang dapat diedit**, buk
 - `exports/*.stl` — file mesh hasil ekspor untuk slicer/cetak 3D.
 - `export_parts.sh` — skrip untuk mengekspor ulang seluruh STL dan preview.
 
-Buka `hand_prototype.scad` di OpenSCAD dan gunakan Customizer `part`, atau jalankan `./mechanical/export_parts.sh` dari root proyek. Ubah parameter di bagian atas file untuk menyesuaikan lebar telapak, ukuran servo, diameter pin, dan jalur tendon. Dimensi default adalah perkiraan untuk demonstrator; ukur ulang komponen servo, toleransi printer, dan bahan sebelum mencetak semua bagian.
+Buka `hand_prototype.scad` di OpenSCAD dan gunakan Customizer `part`, atau dari root proyek jalankan `bash mechanical/export_parts.sh`. Ubah parameter di bagian atas file untuk menyesuaikan lebar telapak, ukuran servo, diameter pin, dan jalur tendon. Dimensi default adalah perkiraan untuk demonstrator; ukur ulang komponen servo, toleransi printer, dan bahan sebelum mencetak semua bagian.
 
 ## Rakit awal (meja kerja saja)
 
