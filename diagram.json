@@ -1,36 +1,146 @@
 {
   "version": 1,
-  "author": "Bionic Hand Prototype",
+  "author": "Erlangga Feditya Hartanto",
   "editor": "wokwi",
   "parts": [
     {
       "type": "wokwi-esp32-devkit-v1",
       "id": "esp",
-      "top": 5,
-      "left": 10,
+      "top": 0,
+      "left": 230,
       "attrs": {}
     },
     {
       "type": "wokwi-potentiometer",
       "id": "emg_mock",
-      "top": 65,
-      "left": -150,
-      "attrs": { "value": "0" }
+      "top": 0,
+      "left": -100,
+      "attrs": {
+        "value": "0"
+      }
     },
     {
       "type": "wokwi-servo",
       "id": "servo1",
-      "top": -75,
-      "left": 255,
-      "attrs": { "horn": "single" }
+      "top": 0,
+      "left": 560,
+      "attrs": {
+        "horn": "single"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "title",
+      "top": -130,
+      "left": -100,
+      "attrs": {
+        "text": "PROTOTIPE TANGAN MYOELEKTRIK\nWokwi: mock EMG + ESP32 + servo"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "pot_voltage",
+      "top": 130,
+      "left": -110,
+      "attrs": {
+        "text": "MOCK EMG / POT\nCatu: 3.3 V\nSIG: 0-3.3 V -> GPIO34\nBukan sensor elektroda"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "esp_voltage",
+      "top": 230,
+      "left": 150,
+      "attrs": {
+        "text": "ESP32 DevKit V1\nGPIO / ADC: jangan di atas 3.3 V\nGPIO18 -> PWM servo (logika 3.3 V)"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "servo_voltage",
+      "top": 140,
+      "left": 650,
+      "attrs": {
+        "text": "SERVO\nCatu: 5 V (virtual)\nPWM: logika 3.3 V"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "power_note",
+      "top": 320,
+      "left": -100,
+      "attrs": {
+        "text": "SIMULASI: rail VIN / 5 V virtual -> servo.\nNYATA: catu servo 5-6 V terpisah sesuai datasheet + GND bersama.\nJangan sambungkan 5 V ke GPIO/ADC ESP32."
+      }
     }
   ],
   "connections": [
-    [ "emg_mock:VCC", "esp:3V3", "red", [] ],
-    [ "emg_mock:GND", "esp:GND.1", "black", [] ],
-    [ "emg_mock:SIG", "esp:34", "green", [] ],
-    [ "servo1:PWM", "esp:18", "orange", [] ],
-    [ "servo1:V+", "esp:5V", "red", [] ],
-    [ "servo1:GND", "esp:GND.2", "black", [] ]
+    [
+      "emg_mock:VCC",
+      "esp:3V3",
+      "red",
+      [
+        "v15",
+        "h220",
+        "v-150",
+        "*",
+        "h40"
+      ]
+    ],
+    [
+      "emg_mock:GND",
+      "esp:GND.2",
+      "black",
+      [
+        "v25",
+        "h260",
+        "*",
+        "h-20"
+      ]
+    ],
+    [
+      "emg_mock:SIG",
+      "esp:D34",
+      "green",
+      [
+        "v10",
+        "h170",
+        "*",
+        "h-30"
+      ]
+    ],
+    [
+      "servo1:PWM",
+      "esp:D18",
+      "orange",
+      [
+        "h-100",
+        "*",
+        "h30"
+      ]
+    ],
+    [
+      "servo1:V+",
+      "esp:VIN",
+      "red",
+      [
+        "h-70",
+        "v200",
+        "*",
+        "v50",
+        "h-30"
+      ]
+    ],
+    [
+      "servo1:GND",
+      "esp:GND.1",
+      "black",
+      [
+        "h-30",
+        "v120",
+        "*",
+        "h50"
+      ]
+    ]
   ]
 }
