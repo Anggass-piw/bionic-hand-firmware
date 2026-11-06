@@ -10,6 +10,8 @@ constexpr uint8_t kServoPin = 18;
 
 constexpr uint32_t kAdcMax = 4095;
 constexpr uint16_t kFilterWindow = 25;
+// false keeps the existing MAV behavior; set true to control from RMS instead.
+constexpr bool kUseRmsFeature = false;
 constexpr uint16_t kSampleIntervalMs = 2;       // 500 Hz sampling target
 constexpr uint16_t kServoUpdateIntervalMs = 20; // 50 Hz servo updates
 constexpr uint8_t kServoStepDegrees = 2;
