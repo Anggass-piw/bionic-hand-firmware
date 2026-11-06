@@ -11,6 +11,8 @@ int main() {
 
   assert(std::fabs(filter.update(2000) - 0.0f) < 0.001f);
   assert(std::fabs(filter.update(2100) - 50.0f) < 0.001f);
+  assert(std::fabs(filter.mav() - 50.0f) < 0.001f);
+  assert(std::fabs(filter.rms() - std::sqrt(5000.0f)) < 0.01f);
 
   // With a 25-sample window, one 100-count excursion averages to 4 counts
   // after 25 baseline samples have fully entered the window.
@@ -18,6 +20,8 @@ int main() {
   filter.setBaseline(1000.0f);
   assert(std::fabs(filter.update(1100) - 100.0f) < 0.001f);
   for (int i = 0; i < 24; ++i) filter.update(1000);
+  assert(std::fabs(filter.mav() - 4.0f) < 0.001f);
+  assert(std::fabs(filter.rms() - 20.0f) < 0.001f);
   assert(std::fabs(filter.update(1000) - 0.0f) < 0.001f);
 
   const int open = 10;
