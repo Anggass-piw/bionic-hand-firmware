@@ -1,6 +1,6 @@
 // Parametric educational prosthetic-hand demonstrator, not a medical device.
 // Set `part` in OpenSCAD Customizer or with: -D 'part="palm"'
-part = "assembly"; // [assembly, palm, servo_bracket, finger_29, finger_23, finger_18, thumb_26, thumb_20, thumb_16, print_layout]
+part = "assembly"; // [assembly, palm, servo_bracket, electronics_base, electronics_lid, electronics_enclosure, finger_29, finger_23, finger_18, thumb_26, thumb_20, thumb_16, print_layout]
 
 $fn = 40;
 
@@ -19,6 +19,21 @@ servo_floor = 4;
 
 pin_diameter = 3.4;   // M3 clearance; verify with the actual printer
 line_diameter = 2.6;  // fishing-line/tendon channel; verify line diameter
+
+// Generic removable electronics pod: placeholder dimensions, not PCB-specific.
+electronics_inner_width = 58;
+electronics_inner_length = 42;
+electronics_inner_height = 16;
+electronics_wall = 2;
+electronics_floor = 2;
+electronics_lid_thickness = 2;
+electronics_lid_lip_depth = 2.5;
+electronics_fit_clearance = 0.35;
+electronics_mount_inset = 5;
+electronics_screw_diameter = 3.4;
+electronics_cable_slot_width = 12;
+electronics_cable_slot_height = 6;
+electronics_corner_radius = 5;
 
 module rounded_plate_2d(width, length, radius) {
   hull() {
@@ -100,6 +115,74 @@ module servo_bracket() {
   }
 }
 
+module rounded_prism(width, depth, height, radius) {
+  linear_extrude(height = height)
+    offset(r = radius)
+      square([width - 2 * radius, depth - 2 * radius], center = true);
+}
+
+module electronics_base() {
+  outer_width = electronics_inner_width + 2 * electronics_wall;
+  outer_length = electronics_inner_length + 2 * electronics_wall;
+  base_height = electronics_floor + electronics_inner_height;
+  screw_x = electronics_inner_width / 2 - electronics_mount_inset;
+  screw_y = electronics_inner_length / 2 - electronics_mount_inset;
+
+  difference() {
+    rounded_prism(outer_width, outer_length, base_height,
+                  electronics_corner_radius);
+    translate([0, 0, electronics_floor])
+      rounded_prism(electronics_inner_width, electronics_inner_length,
+                    electronics_inner_height + 0.2,
+                    electronics_corner_radius - electronics_wall);
+
+    // Cable openings on both short ends; add grommets/strain relief in hardware.
+    for (side = [-1, 1])
+      translate([0, side * (outer_length / 2),
+                 electronics_floor + electronics_inner_height / 2])
+        cube([electronics_cable_slot_width, electronics_wall + 0.4,
+              electronics_cable_slot_height], center = true);
+
+    // Generic floor mounting holes; verify screw and board positions first.
+    for (x = [-screw_x, screw_x])
+      for (y = [-screw_y, screw_y])
+        translate([x, y, -0.1])
+          cylinder(d = electronics_screw_diameter,
+                   h = electronics_floor + 0.2);
+  }
+}
+
+module electronics_lid() {
+  outer_width = electronics_inner_width + 2 * electronics_wall;
+  outer_length = electronics_inner_length + 2 * electronics_wall;
+  screw_x = electronics_inner_width / 2 - electronics_mount_inset;
+  screw_y = electronics_inner_length / 2 - electronics_mount_inset;
+  lip_width = electronics_inner_width - 2 * electronics_fit_clearance;
+  lip_length = electronics_inner_length - 2 * electronics_fit_clearance;
+
+  difference() {
+    union() {
+      rounded_prism(outer_width, outer_length, electronics_lid_thickness,
+                    electronics_corner_radius);
+      translate([0, 0, -electronics_lid_lip_depth])
+        rounded_prism(lip_width, lip_length, electronics_lid_lip_depth,
+                      electronics_corner_radius - electronics_wall);
+    }
+
+    for (x = [-screw_x, screw_x])
+      for (y = [-screw_y, screw_y])
+        translate([x, y, -electronics_lid_lip_depth - 0.1])
+          cylinder(d = electronics_screw_diameter,
+                   h = electronics_lid_lip_depth + electronics_lid_thickness + 0.2);
+  }
+}
+
+module electronics_enclosure() {
+  base_height = electronics_floor + electronics_inner_height;
+  electronics_base();
+  translate([0, 0, base_height]) electronics_lid();
+}
+
 module finger_chain(lengths = [29, 23, 18], widths = [14, 12, 10],
                     bends = [12, 18]) {
   d1 = lengths[0] / 2 - widths[0] / 2;
@@ -141,6 +224,12 @@ module assembly_preview() {
   color("orange")
     translate([0, -18, palm_thickness + servo_floor + servo_height + 1.5])
       cylinder(d = 14, h = 3, center = true);
+
+  // Placeholder pod under the wrist; board dimensions and clearances need fitting.
+  color("lightgray")
+    translate([0, -40,
+               -(electronics_floor + electronics_inner_height + electronics_lid_thickness)])
+      electronics_enclosure();
 }
 
 module print_layout() {
@@ -163,6 +252,12 @@ if (part == "assembly") {
   palm();
 } else if (part == "servo_bracket") {
   servo_bracket();
+} else if (part == "electronics_base") {
+  electronics_base();
+} else if (part == "electronics_lid") {
+  electronics_lid();
+} else if (part == "electronics_enclosure") {
+  electronics_enclosure();
 } else if (part == "finger_29") {
   finger_link(29, 14, 8);
 } else if (part == "finger_23") {

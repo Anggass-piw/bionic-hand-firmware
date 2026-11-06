@@ -14,6 +14,8 @@ export_stl() {
 
 export_stl palm palm
 export_stl servo_bracket servo_bracket
+export_stl electronics_base electronics_base
+export_stl electronics_lid electronics_lid
 export_stl finger_link_29mm finger_29
 export_stl finger_link_23mm finger_23
 export_stl finger_link_18mm finger_18
