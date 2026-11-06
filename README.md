@@ -4,14 +4,17 @@ Proyek edukasional untuk menguji alur sinyal EMG → filter → target servo pad
 
 ## Isi proyek
 
-- `src/` dan `include/` — firmware C++: baseline rileks, kalibrasi kontraksi, rectification + moving-average, threshold/hysteresis, dan gerak servo bertahap.
+- `src/` dan `include/` — firmware C++: baseline rileks, rectification, moving window, fitur MAV/RMS, threshold/hysteresis, telemetry, dan gerak servo bertahap.
 - `platformio.ini` — build untuk ESP32 DevKit (`esp32dev`) dan library `ESP32Servo`.
-- `mechanical/hand_prototype.scad` — file sumber CAD OpenSCAD; bisa dibuka, diedit, dan diubah parameternya.
-- `mechanical/exports/*.stl` — telapak, bracket servo, link jari/ibu jari, dan layout cetak.
+- `mechanical/hand_prototype.scad` — file sumber CAD OpenSCAD; termasuk pod elektronik generik di bawah pergelangan yang parameternya bisa diedit.
+- `mechanical/exports/*.stl` — telapak, bracket servo, base/lid enclosure, link jari/ibu jari, dan layout cetak.
 - `mechanical/exports/openscad-application.png` — screenshot langsung dari OpenSCAD yang memperlihatkan source, parameter Customizer, dan model 3D; ini dokumentasi aplikasi CAD, bukan gambar AI.
 - `diagram.json` + `wokwi.toml` — ESP32, potensiometer sebagai mock sensor EMG, dan servo untuk simulasi.
 - `wokwi/circuit-documentation.png` — gambar canvas Wokwi asli dengan keterangan voltase.
-- `test/` — tes logika C++ native dan pemeriksaan struktur diagram Wokwi.
+- `tools/serial-monitor.js` — CLI Node.js untuk membaca telemetry serial; parser dapat dites tanpa perangkat.
+- `test/` — tes logika C++ native, tes parser Node.js, dan pemeriksaan struktur diagram Wokwi.
+- [`docs/processing-pipeline.md`](docs/processing-pipeline.md) — alur sinyal, batas integrasi analog, dan hal yang belum diimplementasikan.
+- [`docs/hardware-interface.md`](docs/hardware-interface.md) — peta interface konseptual dan rencana validasi hardware.
 
 ## Build dan tes firmware
 
@@ -26,6 +29,7 @@ Tes lokal tanpa board:
 ```bash
 bash test/run_native_tests.sh
 python3 test/validate_wokwi_diagram.py
+npm test
 ```
 
 Di VS Code, buka folder proyek, gunakan PlatformIO IDE, lalu pilih **PlatformIO: Build**. Untuk upload/monitor hardware gunakan board dan port yang benar; firmware memakai Serial Monitor 115200 baud.
@@ -40,7 +44,20 @@ Kirim karakter melalui Serial Monitor:
 - `o` / `m` — perintah manual untuk buka / sudut genggam uji tanpa beban.
 - `?` — bantuan.
 
-Pin, threshold, rentang sudut, dan waktu halus ada di `include/config.h`. Sudut bawaan hanya titik awal; sesuaikan mekanisme secara bertahap di meja kerja.
+Pin, pemilihan fitur (MAV bawaan atau RMS), threshold, rentang sudut, dan waktu halus ada di `include/config.h`. MAV dan RMS dihitung pada jendela 25 sampel; fitur terpilih dipakai untuk kalibrasi serta kontrol. Sudut bawaan hanya titik awal; sesuaikan mekanisme secara bertahap di meja kerja.
+
+## Pemantau serial Node.js
+
+Pasang dependensi, lihat port, lalu hubungkan pemantau pada baud 115200:
+
+```bash
+npm install
+npm run serial-monitor -- --list-ports
+npm run serial-monitor -- --port /dev/ttyUSB0
+# Windows: npm run serial-monitor -- --port COM3
+```
+
+Pemantau hanya membaca telemetry dan dapat dihentikan dengan Ctrl-C. Lihat [dokumentasi alur sinyal](docs/processing-pipeline.md) untuk format data, rumus, batas perangkat keras, dan catatan keselamatan.
 
 ## Model CAD 3D
 

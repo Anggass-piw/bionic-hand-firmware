@@ -1,0 +1,17 @@
+{
+  "name": "bionic-hand-firmware-serial-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Utility pemantau telemetry serial untuk firmware tangan bionik",
+  "main": "tools/telemetry-parser.js",
+  "scripts": {
+    "test": "node --test test/node/*.test.js",
+    "serial-monitor": "node tools/serial-monitor.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "serialport": "^13.0.0"
+  }
+}
