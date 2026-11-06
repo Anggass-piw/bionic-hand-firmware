@@ -21,6 +21,8 @@ float baselineAdc = 0.0f;
 float peakAmplitude = 0.0f;
 float thresholdAmplitude = 0.0f;
 float latestEnvelope = 0.0f;
+float latestMav = 0.0f;
+float latestRms = 0.0f;
 float restAccumulator = 0.0f;
 uint32_t restSampleCount = 0;
 uint32_t calibrationStartedAt = 0;
@@ -139,7 +141,10 @@ void processSample(int rawAdc, uint32_t now) {
   }
 
   if (!baselineCalibrated) return;
-  latestEnvelope = emgFilter.update(rawAdc);
+  emgFilter.update(rawAdc);
+  latestMav = emgFilter.mav();
+  latestRms = emgFilter.rms();
+  latestEnvelope = config::kUseRmsFeature ? latestRms : latestMav;
 
   if (calibrationMode == CalibrationMode::kContractionPeak) {
     if (latestEnvelope > peakAmplitude) peakAmplitude = latestEnvelope;
@@ -190,6 +195,8 @@ void setup() {
   servoHandler.begin(config::kServoPin, config::kServoOpenDeg);
   Serial.println();
   Serial.println(F("EMG prosthetic-hand prototype firmware; bench test only."));
+  Serial.print(F("Fitur kontrol: "));
+  Serial.println(config::kUseRmsFeature ? F("RMS") : F("MAV"));
   printHelp();
   Serial.println(F("Pastikan output sensor aman untuk ADC ESP32 dan servo punya catu daya terpisah."));
 }
@@ -209,6 +216,18 @@ void loop() {
       Serial.print(rawAdc);
       Serial.print(F(" env="));
       Serial.print(latestEnvelope, 1);
+      Serial.print(F(" mav="));
+      Serial.print(latestMav, 1);
+      Serial.print(F(" rms="));
+      Serial.print(latestRms, 1);
+      Serial.print(F(" feature="));
+      Serial.print(latestEnvelope, 1);
+      Serial.print(F(" mode="));
+      Serial.print(config::kUseRmsFeature ? F("RMS") : F("MAV"));
+      Serial.print(F(" threshold="));
+      Serial.print(thresholdAmplitude, 1);
+      Serial.print(F(" active="));
+      Serial.print(contractionActive ? 1 : 0);
       Serial.print(F(" target="));
       Serial.print(servoHandler.targetAngle());
       Serial.print(F(" current="));
